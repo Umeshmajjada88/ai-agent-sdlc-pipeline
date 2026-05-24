@@ -1,5 +1,7 @@
 package com.example.springaidemo.service;
 
+import com.example.springaidemo.dto.EntityMetadata;
+import com.example.springaidemo.dto.FieldMetadata;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -10,7 +12,9 @@ import java.nio.file.Paths;
 @Service
 public class ProjectGeneratorService {
 
-    public void generateProject(String projectPath) throws IOException {
+    public void generateProject(
+            String projectPath,
+            EntityMetadata metadata) throws IOException {
 
         Path root = Paths.get(projectPath);
 
@@ -25,10 +29,11 @@ public class ProjectGeneratorService {
         createPom(root);
         createProperties(root);
         createMain(root);
-        createEntity(root);
-        createRepository(root);
-        createService(root);
-        createController(root);
+
+        createEntity(root, metadata);
+        createRepository(root, metadata);
+        createService(root, metadata);
+        createController(root, metadata);
     }
 
     private void createPom(Path root) throws IOException {
@@ -66,6 +71,11 @@ public class ProjectGeneratorService {
                         <dependency>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-starter-data-jpa</artifactId>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-validation</artifactId>
                         </dependency>
 
                         <dependency>
@@ -128,12 +138,39 @@ public class ProjectGeneratorService {
                 """;
 
         Files.writeString(
-                root.resolve("src/main/java/com/example/generated/GeneratedApplication.java"),
+                root.resolve(
+                        "src/main/java/com/example/generated/GeneratedApplication.java"
+                ),
                 main
         );
     }
 
-    private void createEntity(Path root) throws IOException {
+    private void createEntity(
+            Path root,
+            EntityMetadata metadata) throws IOException {
+
+        String entityName = metadata.getEntity();
+
+        StringBuilder fields = new StringBuilder();
+
+        for (FieldMetadata field : metadata.getFields()) {
+
+            if (field.getName().equalsIgnoreCase("id")) {
+
+                fields.append("""
+                        @Id
+                        @GeneratedValue(strategy = GenerationType.IDENTITY)
+                        """);
+            }
+
+            fields.append(
+                    "private "
+                            + field.getType()
+                            + " "
+                            + field.getName()
+                            + ";\n\n"
+            );
+        }
 
         String entity = """
                 package com.example.generated.entity;
@@ -145,50 +182,67 @@ public class ProjectGeneratorService {
                 @Data
                 @NoArgsConstructor
                 @AllArgsConstructor
-                public class Employee {
+                public class %s {
 
-                    @Id
-                    @GeneratedValue(strategy = GenerationType.IDENTITY)
-                    private Long id;
-
-                    private String name;
-
-                    private Double salary;
+                    %s
                 }
-                """;
+                """.formatted(
+                entityName,
+                fields.toString()
+        );
 
         Files.writeString(
-                root.resolve("src/main/java/com/example/generated/entity/Employee.java"),
+                root.resolve(
+                        "src/main/java/com/example/generated/entity/"
+                                + entityName
+                                + ".java"
+                ),
                 entity
         );
     }
 
-    private void createRepository(Path root) throws IOException {
+    private void createRepository(
+            Path root,
+            EntityMetadata metadata) throws IOException {
+
+        String entityName = metadata.getEntity();
 
         String repository = """
                 package com.example.generated.repository;
 
-                import com.example.generated.entity.Employee;
+                import com.example.generated.entity.%s;
                 import org.springframework.data.jpa.repository.JpaRepository;
 
-                public interface EmployeeRepository
-                        extends JpaRepository<Employee, Long> {
+                public interface %sRepository
+                        extends JpaRepository<%s, Long> {
                 }
-                """;
+                """.formatted(
+                entityName,
+                entityName,
+                entityName
+        );
 
         Files.writeString(
-                root.resolve("src/main/java/com/example/generated/repository/EmployeeRepository.java"),
+                root.resolve(
+                        "src/main/java/com/example/generated/repository/"
+                                + entityName
+                                + "Repository.java"
+                ),
                 repository
         );
     }
 
-    private void createService(Path root) throws IOException {
+    private void createService(
+            Path root,
+            EntityMetadata metadata) throws IOException {
+
+        String entityName = metadata.getEntity();
 
         String service = """
                 package com.example.generated.service;
 
-                import com.example.generated.entity.Employee;
-                import com.example.generated.repository.EmployeeRepository;
+                import com.example.generated.entity.%s;
+                import com.example.generated.repository.%sRepository;
                 import lombok.RequiredArgsConstructor;
                 import org.springframework.stereotype.Service;
 
@@ -196,59 +250,91 @@ public class ProjectGeneratorService {
 
                 @Service
                 @RequiredArgsConstructor
-                public class EmployeeService {
+                public class %sService {
 
-                    private final EmployeeRepository repository;
+                    private final %sRepository repository;
 
-                    public List<Employee> getAll() {
+                    public List<%s> getAll() {
                         return repository.findAll();
                     }
 
-                    public Employee save(Employee employee) {
-                        return repository.save(employee);
+                    public %s save(%s entity) {
+                        return repository.save(entity);
                     }
                 }
-                """;
+                """.formatted(
+                entityName,
+                entityName,
+                entityName,
+                entityName,
+                entityName,
+                entityName,
+                entityName
+        );
 
         Files.writeString(
-                root.resolve("src/main/java/com/example/generated/service/EmployeeService.java"),
+                root.resolve(
+                        "src/main/java/com/example/generated/service/"
+                                + entityName
+                                + "Service.java"
+                ),
                 service
         );
     }
 
-    private void createController(Path root) throws IOException {
+    private void createController(
+            Path root,
+            EntityMetadata metadata) throws IOException {
+
+        String entityName = metadata.getEntity();
+
+        String endpoint =
+                entityName.toLowerCase() + "s";
 
         String controller = """
                 package com.example.generated.controller;
 
-                import com.example.generated.entity.Employee;
-                import com.example.generated.service.EmployeeService;
+                import com.example.generated.entity.%s;
+                import com.example.generated.service.%sService;
                 import lombok.RequiredArgsConstructor;
                 import org.springframework.web.bind.annotation.*;
 
                 import java.util.List;
 
                 @RestController
-                @RequestMapping("/employees")
+                @RequestMapping("/%s")
                 @RequiredArgsConstructor
-                public class EmployeeController {
+                public class %sController {
 
-                    private final EmployeeService service;
+                    private final %sService service;
 
                     @GetMapping
-                    public List<Employee> getAll() {
+                    public List<%s> getAll() {
                         return service.getAll();
                     }
 
                     @PostMapping
-                    public Employee save(@RequestBody Employee employee) {
-                        return service.save(employee);
+                    public %s save(@RequestBody %s entity) {
+                        return service.save(entity);
                     }
                 }
-                """;
+                """.formatted(
+                entityName,
+                entityName,
+                endpoint,
+                entityName,
+                entityName,
+                entityName,
+                entityName,
+                entityName
+        );
 
         Files.writeString(
-                root.resolve("src/main/java/com/example/generated/controller/EmployeeController.java"),
+                root.resolve(
+                        "src/main/java/com/example/generated/controller/"
+                                + entityName
+                                + "Controller.java"
+                ),
                 controller
         );
     }

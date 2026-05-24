@@ -17,7 +17,12 @@ public class RequirementAgent {
         String prompt = """
                 You are a software architect.
 
-                Extract ONLY JSON.
+                Return ONLY raw JSON.
+
+DO NOT generate markdown.
+DO NOT use ```json.
+DO NOT explain anything.
+
 
                 Example:
 
