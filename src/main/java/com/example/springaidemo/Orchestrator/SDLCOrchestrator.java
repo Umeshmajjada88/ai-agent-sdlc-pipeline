@@ -1,8 +1,9 @@
 package com.example.springaidemo.Orchestrator;
 
-
-import com.example.springaidemo.Agents.BackendAgent;
 import com.example.springaidemo.Agents.RequirementAgent;
+import com.example.springaidemo.dto.GenerateProjectResponse;
+import com.example.springaidemo.service.ProjectGeneratorService;
+import com.example.springaidemo.service.ProjectRunnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,24 +12,26 @@ import org.springframework.stereotype.Service;
 public class SDLCOrchestrator {
 
     private final RequirementAgent requirementAgent;
-    private final BackendAgent backendAgent;
+    private final ProjectGeneratorService generatorService;
+    private final ProjectRunnerService runnerService;
 
-    public String execute(String input) {
+    public GenerateProjectResponse generate(
+            String requirement,
+            String path) throws Exception {
 
-        // STEP 1
-        String analyzedRequirement =
-                requirementAgent.analyze(input);
+        String metadata =
+                requirementAgent.analyze(requirement);
 
-        System.out.println("Requirement Analysis:");
-        System.out.println(analyzedRequirement);
+        System.out.println(metadata);
 
-        // STEP 2
-        String generatedCode =
-                backendAgent.generateCrudCode(analyzedRequirement);
+        generatorService.generateProject(path);
 
-        System.out.println("Generated Code:");
-        System.out.println(generatedCode);
+        runnerService.runProject(path);
 
-        return generatedCode;
+        return GenerateProjectResponse.builder()
+                .status("SUCCESS")
+                .projectPath(path)
+                .runningUrl("http://localhost:8000")
+                .build();
     }
 }

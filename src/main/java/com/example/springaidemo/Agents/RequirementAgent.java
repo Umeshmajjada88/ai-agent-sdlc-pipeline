@@ -1,32 +1,38 @@
 package com.example.springaidemo.Agents;
 
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RequirementAgent {
 
-    private final ChatClient chatClient;
+    private final ChatClient.Builder builder;
 
-    public RequirementAgent(ChatClient.Builder builder) {
-        this.chatClient = builder.build();
-    }
+    public String analyze(String requirement) {
 
-    public String analyze(String input) {
+        ChatClient chatClient = builder.build();
 
         String prompt = """
-        Analyze this CRUD application requirement.
+                You are a software architect.
 
-        Return clearly:
+                Extract ONLY JSON.
 
-        Entity Name:
-        Fields:
-        CRUD Operations:
+                Example:
 
-        Requirement:
-        %s
-        """.formatted(input);
+                {
+                "entity":"Employee",
+                "fields":[
+                    {"name":"id","type":"Long"},
+                    {"name":"name","type":"String"},
+                    {"name":"salary","type":"Double"}
+                ]
+                }
+
+                Requirement:
+                %s
+                """.formatted(requirement);
 
         return chatClient.prompt()
                 .user(prompt)
