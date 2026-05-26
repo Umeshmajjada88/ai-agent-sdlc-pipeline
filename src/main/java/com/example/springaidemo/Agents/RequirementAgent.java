@@ -1,6 +1,5 @@
 package com.example.springaidemo.Agents;
 
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +15,16 @@ public class RequirementAgent {
     public String analyze(String input) {
 
         String prompt = """
-        Analyze this CRUD application requirement.
+                Analyze this CRUD application requirement.
 
-        Return clearly:
+                Return:
+                1. Entity Name
+                2. Fields
+                3. CRUD Operations
 
-        Entity Name:
-        Fields:
-        CRUD Operations:
-
-        Requirement:
-        %s
-        """.formatted(input);
+                Requirement:
+                %s
+                """.formatted(input);
 
         return chatClient.prompt()
                 .user(prompt)

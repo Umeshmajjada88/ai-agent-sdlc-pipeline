@@ -1,4 +1,4 @@
-package com.example.springaidemo.Controller;
+package com.example.springaidemo.controller;
 
 
 
