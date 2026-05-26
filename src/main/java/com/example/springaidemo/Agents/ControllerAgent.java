@@ -3,6 +3,8 @@ package com.example.springaidemo.Agents;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import com.example.springaidemo.utils.AIResponseCleaner;
+
 @Service
 public class ControllerAgent {
 
@@ -54,9 +56,11 @@ public class ControllerAgent {
                 serviceCode,
                 requirement);
 
-        return chatClient.prompt()
-                .user(prompt)
-                .call()
-                .content();
+        String response = chatClient.prompt()
+        .user(prompt)
+        .call()
+        .content();
+
+        return AIResponseCleaner.clean(response);
     }
 }

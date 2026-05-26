@@ -2,6 +2,7 @@ package com.example.springaidemo.Agents;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import com.example.springaidemo.utils.AIResponseCleaner;
 
 @Service
 public class EntityAgent {
@@ -40,9 +41,11 @@ public class EntityAgent {
                 %s
                 """.formatted(requirement);
 
-        return chatClient.prompt()
+        String response = chatClient.prompt()
                 .user(prompt)
                 .call()
                 .content();
+
+        return AIResponseCleaner.clean(response);
     }
 }
