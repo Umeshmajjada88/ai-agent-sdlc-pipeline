@@ -3,6 +3,7 @@ package com.example.springaidemo.Agents;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import com.example.springaidemo.DTO.RequirementDTO;
 import com.example.springaidemo.utils.AIResponseCleaner;
 
 @Service
@@ -15,9 +16,10 @@ public class ServiceAgent {
     }
 
     public String generateService(
-            String requirement,
+            RequirementDTO requirement,
             String entityCode,
-            String repositoryCode) {
+            String repositoryCode,
+            String entityName) {
 
         String prompt = """
                 You are an expert Spring Boot developer.
@@ -35,8 +37,8 @@ public class ServiceAgent {
 
                 Examples of required inputs based on entity class and repository class are as follows:
                 REQUIRED IMPORTS:
-                import com.example.springaidemo.entity.Student;
-                import com.example.springaidemo.repository.StudentRepository;
+                import com.example.springaidemo.entity.%s;
+                import com.example.springaidemo.repository.%sRepository;
 
                 import org.springframework.stereotype.Service;
 
@@ -51,7 +53,8 @@ public class ServiceAgent {
 
                 Requirement:
                 %s
-                """.formatted(
+                """.formatted(entityName,
+                        entityName,
                 entityCode,
                 repositoryCode,
                 requirement);

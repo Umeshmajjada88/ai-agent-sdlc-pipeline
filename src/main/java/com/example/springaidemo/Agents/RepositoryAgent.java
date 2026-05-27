@@ -3,6 +3,7 @@ package com.example.springaidemo.Agents;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import com.example.springaidemo.DTO.RequirementDTO;
 import com.example.springaidemo.utils.AIResponseCleaner;
 
 @Service
@@ -15,8 +16,9 @@ public class RepositoryAgent {
     }
 
     public String generateRepository(
-            String requirement,
-            String entityCode) {
+            RequirementDTO requirement,
+            String entityCode,
+            String entityName) {
 
         String prompt = """
                 You are an expert Spring Boot developer.
@@ -33,7 +35,7 @@ public class RepositoryAgent {
                 package com.example.springaidemo.repository;
 
                 REQUIRED IMPORTS:
-                import com.example.springaidemo.entity.Student;
+                import com.example.springaidemo.entity.%s;
 
                 import org.springframework.data.jpa.repository.JpaRepository;
                 import org.springframework.stereotype.Repository;
@@ -43,7 +45,10 @@ public class RepositoryAgent {
 
                 Requirement:
                 %s
-                """.formatted(entityCode, requirement);
+                """.formatted(
+                entityName,
+                entityCode,
+                requirement);
 
         String response = chatClient.prompt()
         .user(prompt)
