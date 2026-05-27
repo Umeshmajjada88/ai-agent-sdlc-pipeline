@@ -1,6 +1,7 @@
 package com.example.springaidemo.Orchestrator;
 
 import com.example.springaidemo.Agents.*;
+import com.example.springaidemo.DTO.RequirementDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +27,9 @@ public class SDLCOrchestrator {
                 try {
 
                         // STEP 1 - Analyze Requirement
-                        String requirement = requirementAgent.analyze(input);
-                        String entityName = extractEntityName(requirement);
+                        RequirementDTO requirement = requirementAgent.analyze(input);
+                        String entityName = requirement.getEntityName();
+                        
 
                         // STEP 2 - Generate Entity
                         String entityCode = entityAgent.generateEntity(requirement);
@@ -102,19 +106,18 @@ public class SDLCOrchestrator {
         
         private String extractEntityName(String requirement) {
 
-                String[] lines = requirement.split("\\n");
+                Pattern pattern = Pattern.compile(
+                                "Entity\\s*Name\\s*:\\s*(\\w+)",
+                                Pattern.CASE_INSENSITIVE);
 
-                for (String line : lines) {
+                Matcher matcher = pattern.matcher(requirement);
 
-                        if (line.startsWith("Entity Name:")) {
+                if (matcher.find()) {
 
-                                return line.replace(
-                                                "Entity Name:",
-                                                "").trim();
-                        }
+                        return matcher.group(1).trim();
                 }
 
-                throw new RuntimeException(
-                                "Entity Name not found in requirement");
+                // FALLBACK
+                return "Student";
         }
 }

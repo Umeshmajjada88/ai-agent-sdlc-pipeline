@@ -3,6 +3,7 @@ package com.example.springaidemo.Agents;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import com.example.springaidemo.DTO.RequirementDTO;
 import com.example.springaidemo.utils.AIResponseCleaner;
 
 @Service
@@ -15,7 +16,7 @@ public class RepositoryAgent {
     }
 
     public String generateRepository(
-            String requirement,
+            RequirementDTO requirement,
             String entityCode,
             String entityName) {
 
