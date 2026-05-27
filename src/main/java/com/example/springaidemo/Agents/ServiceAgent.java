@@ -33,6 +33,7 @@ public class ServiceAgent {
                 REQUIRED PACKAGE:
                 package com.example.springaidemo.service;
 
+                Examples of required inputs based on entity class and repository class are as follows:
                 REQUIRED IMPORTS:
                 import com.example.springaidemo.entity.Student;
                 import com.example.springaidemo.repository.StudentRepository;
@@ -56,9 +57,9 @@ public class ServiceAgent {
                 requirement);
 
         String response = chatClient.prompt()
-        .user(prompt)
-        .call()
-        .content();
+                .user(prompt)
+                .call()
+                .content();
 
         return AIResponseCleaner.clean(response);
     }
