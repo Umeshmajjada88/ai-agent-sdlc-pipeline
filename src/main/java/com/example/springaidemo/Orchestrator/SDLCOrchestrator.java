@@ -21,6 +21,7 @@ public class SDLCOrchestrator {
         private final RepositoryAgent repositoryAgent;
         private final ServiceAgent serviceAgent;
         private final ControllerAgent controllerAgent;
+        private final FeignClientAgent feignClientAgent;
 
         public String execute(String input) {
 
@@ -30,7 +31,8 @@ public class SDLCOrchestrator {
                         RequirementDTO requirement = requirementAgent.analyze(input);
                         String entityName = requirement.getEntityName();
                         
-
+                        String feignCode = feignClientAgent.generateFeignClient(
+                                        requirement);
                         // STEP 2 - Generate Entity
                         String entityCode = entityAgent.generateEntity(requirement);
 
@@ -70,6 +72,9 @@ public class SDLCOrchestrator {
                         Files.createDirectories(
                                         Path.of(basePath + "controller"));
 
+                        Files.createDirectories(
+                                        Path.of(basePath + "feign"));
+
                         // SAVE ENTITY
                         Files.writeString(
                                         Path.of(basePath + "entity/" + entityName
@@ -93,6 +98,11 @@ public class SDLCOrchestrator {
                                         Path.of(basePath + "controller/" + entityName
                                                         + "Controller.java"),
                                         controllerCode);
+
+                        // SAVE FEIGN CLIENT
+                        Files.writeString(
+                                        Path.of(basePath + "feign/PaymentClient.java"),
+                                        feignCode);
 
                         return "Files Generated Successfully";
 
