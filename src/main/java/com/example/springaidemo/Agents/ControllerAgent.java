@@ -17,7 +17,8 @@ public class ControllerAgent {
     public String generateController(
             String requirement,
             String entityCode,
-            String serviceCode) {
+            String serviceCode,
+            String entityName) {
 
         String prompt = """
                 You are an expert Spring Boot developer.
@@ -34,8 +35,8 @@ public class ControllerAgent {
                 package com.example.springaidemo.controller;
 
                 REQUIRED IMPORTS:
-                import com.example.springaidemo.entity.Student;
-                import com.example.springaidemo.service.StudentService;
+                import com.example.springaidemo.entity.%s;
+                import com.example.springaidemo.service.%sService;
 
                 import org.springframework.http.ResponseEntity;
                 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,8 @@ public class ControllerAgent {
 
                 Requirement:
                 %s
-                """.formatted(
+                """.formatted(entityName,
+                        entityName,
                 entityCode,
                 serviceCode,
                 requirement);

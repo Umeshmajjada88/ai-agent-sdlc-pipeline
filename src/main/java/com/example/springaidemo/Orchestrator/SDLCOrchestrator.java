@@ -25,6 +25,7 @@ public class SDLCOrchestrator {
 
                         // STEP 1 - Analyze Requirement
                         String requirement = requirementAgent.analyze(input);
+                        String entityName = extractEntityName(requirement);
 
                         // STEP 2 - Generate Entity
                         String entityCode = entityAgent.generateEntity(requirement);
@@ -32,19 +33,22 @@ public class SDLCOrchestrator {
                         // STEP 3 - Generate Repository
                         String repositoryCode = repositoryAgent.generateRepository(
                                         requirement,
-                                        entityCode);
+                                        entityCode,
+                                        entityName);
 
                         // STEP 4 - Generate Service
                         String serviceCode = serviceAgent.generateService(
                                         requirement,
                                         entityCode,
-                                        repositoryCode);
+                                        repositoryCode,
+                                        entityName);
 
                         // STEP 5 - Generate Controller
                         String controllerCode = controllerAgent.generateController(
                                         requirement,
                                         entityCode,
-                                        serviceCode);
+                                        serviceCode,
+                                        entityName);
 
                         // GENERATED PROJECT PATH
                         String basePath = "generated-project/src/main/java/com/example/generated/";
@@ -64,22 +68,26 @@ public class SDLCOrchestrator {
 
                         // SAVE ENTITY
                         Files.writeString(
-                                        Path.of(basePath + "entity/Student.java"),
+                                        Path.of(basePath + "entity/" + entityName
+                                                        + ".java"),
                                         entityCode);
 
                         // SAVE REPOSITORY
                         Files.writeString(
-                                        Path.of(basePath + "repository/StudentRepository.java"),
+                                        Path.of(basePath + "repository/"+ entityName
+                                                        + "Repository.java"),
                                         repositoryCode);
 
                         // SAVE SERVICE
                         Files.writeString(
-                                        Path.of(basePath + "service/StudentService.java"),
+                                        Path.of(basePath + "service/" + entityName
+                                                        + "Service.java"),
                                         serviceCode);
 
                         // SAVE CONTROLLER
                         Files.writeString(
-                                        Path.of(basePath + "controller/StudentController.java"),
+                                        Path.of(basePath + "controller/" + entityName
+                                                        + "Controller.java"),
                                         controllerCode);
 
                         return "Files Generated Successfully";
@@ -90,5 +98,23 @@ public class SDLCOrchestrator {
 
                         return "Error while generating files";
                 }
+        }
+        
+        private String extractEntityName(String requirement) {
+
+                String[] lines = requirement.split("\\n");
+
+                for (String line : lines) {
+
+                        if (line.startsWith("Entity Name:")) {
+
+                                return line.replace(
+                                                "Entity Name:",
+                                                "").trim();
+                        }
+                }
+
+                throw new RuntimeException(
+                                "Entity Name not found in requirement");
         }
 }
