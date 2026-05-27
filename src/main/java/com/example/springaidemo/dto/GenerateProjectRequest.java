@@ -11,4 +11,7 @@ public class GenerateProjectRequest {
 
     @NotBlank
     private String projectPath;
+
+     @NotBlank
+     private String entity;
 }

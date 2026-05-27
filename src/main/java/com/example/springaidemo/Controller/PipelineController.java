@@ -2,6 +2,7 @@ package com.example.springaidemo.Controller;
 
 import com.example.springaidemo.dto.GenerateProjectRequest;
 import com.example.springaidemo.dto.GenerateProjectResponse;
+import com.example.springaidemo.dto.GenerateRequest;
 import com.example.springaidemo.Orchestrator.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,19 @@ public class PipelineController {
     private final SDLCOrchestrator orchestrator;
 
     @PostMapping("/generate-project")
-    public GenerateProjectResponse generate(
-            @Valid @RequestBody GenerateProjectRequest request)
-            throws Exception {
+public GenerateProjectResponse generate(
+        @RequestBody GenerateRequest request)
+        throws Exception {
 
-        return orchestrator.generate(
-                request.getRequirement(),
-                request.getProjectPath()
-        );
-    }
+    return orchestrator.generate(
+            request.getRequirement(),
+            request.getEntity(),
+            request.getProjectPath()
+    );
+}
+}
+
+class ReqesBody { 
+    String name = "";
+    
 }

@@ -15,13 +15,17 @@ public class RequirementAgent {
         ChatClient chatClient = builder.build();
 
         String prompt = """
+
+                
+
                 You are a software architect.
 
                 Return ONLY raw JSON.
+                DO NOT generate markdown.
+                DO NOT use ```json.
+                DO NOT explain anything.
 
-DO NOT generate markdown.
-DO NOT use ```json.
-DO NOT explain anything.
+                
 
 
                 Example:
