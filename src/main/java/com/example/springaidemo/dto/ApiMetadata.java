@@ -10,4 +10,6 @@ public class ApiMetadata {
     private String method;
 
     private String path;
+
+    private String logic;
 }

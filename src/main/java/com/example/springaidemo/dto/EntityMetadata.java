@@ -11,6 +11,8 @@ import java.util.List;
 public class EntityMetadata {
 
     private String entity;
+
     private List<FieldMetadata> fields;
-    private Object database;
+
+    private List<ApiMetadata> apis;
 }

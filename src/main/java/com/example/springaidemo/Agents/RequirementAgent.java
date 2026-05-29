@@ -15,34 +15,44 @@ public class RequirementAgent {
         ChatClient chatClient = builder.build();
 
         String prompt = """
-
-                
-
                 You are a software architect.
 
-                Return ONLY raw JSON.
-                DO NOT generate markdown.
-                DO NOT use ```json.
-                DO NOT explain anything.
+                Return ONLY valid JSON.
 
-                
+                STRICT RULES:
+
+                1. No markdown.
+                2. No explanations.
+                3. No comments.
+                4. No Java code.
+                5. Return ONLY JSON.
+                6. Use only contructor Injection dont use autowired.
+                &. Import List and Optional and every File if needed.
 
 
-                Example:
+                Return format:
 
                 {
-                "entity":"Employee",
-                "fields":[
-                    {"name":"id","type":"Long"},
-                    {"name":"name","type":"String"},
-                    {"name":"salary","type":"Double"}
-                ]
+                  "entity":"Product",
+                  "fields":[
+                    {
+                      "name":"id",
+                      "type":"Long"
+                    }
+                  ],
+                  "apis":[
+                    {
+                      "name":"createProduct",
+                      "method":"POST",
+                      "path":"/products",
+                      "logic":"Create product"
+                    }
+                  ]
                 }
 
                 Requirement:
                 %s
                 """.formatted(requirement);
-
         return chatClient.prompt()
                 .user(prompt)
                 .call()

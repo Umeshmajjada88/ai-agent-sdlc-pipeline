@@ -21,11 +21,12 @@ public GenerateProjectResponse generate(
         @RequestBody GenerateRequest request)
         throws Exception {
 
-    return orchestrator.generate(
-            request.getRequirement(),
-            request.getEntity(),
-            request.getProjectPath()
-    );
+return orchestrator.generate(
+        request.getRequirement(),
+        request.getEntity(),
+        request.getProjectPath(),
+        request.getApis()
+);
 }
 }
 

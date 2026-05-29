@@ -6,18 +6,21 @@ import com.example.springaidemo.Agents.EntityAgent;
 import com.example.springaidemo.Agents.RepositoryAgent;
 import com.example.springaidemo.Agents.RequirementAgent;
 import com.example.springaidemo.Agents.ServiceAgent;
-import com.example.springaidemo.dto.ApiContract;
+import com.example.springaidemo.dto.ApiMetadata;
 import com.example.springaidemo.dto.EntityMetadata;
 import com.example.springaidemo.dto.GenerateProjectResponse;
+import com.example.springaidemo.dto.ServiceGenerationResult;
 import com.example.springaidemo.service.FileWriterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class SDLCOrchestrator {
-
         //hoo
 
     private final RequirementAgent requirementAgent;
@@ -30,10 +33,12 @@ public class SDLCOrchestrator {
 
     private final FileWriterService fileWriterService;
 
-    public GenerateProjectResponse generate(
+ public GenerateProjectResponse generate(
+
         String requirement,
         String entity,
-        String projectPath)throws Exception {
+        String projectPath,
+        List<ApiMetadata> apis)throws Exception {
 
         // STEP 1 — Analyze Requirement
         String metadataJson =
@@ -44,7 +49,7 @@ public class SDLCOrchestrator {
                 .replace("```", "")
                 .trim();
 
-        System.out.println(metadataJson);
+        
 
         // STEP 2 — Convert JSON to DTO
         ObjectMapper mapper = new ObjectMapper();
@@ -59,39 +64,54 @@ public class SDLCOrchestrator {
         String entityName = metadata.getEntity();
         String plural = entityName + "s";
 
-ApiContract apiContract =
-        ApiContract.builder()
-                .createMethod("create" + entityName)
-                .getAllMethod("getAll" + plural)
-                .getByIdMethod("get" + entityName + "ById")
-                .updateMethod("update" + entityName)
-                .deleteMethod("delete" + entityName)
-                .build();
-
-        // STEP 3 — Generate Files
-        String entityCode =
-                entityAgent.generate(metadata);
-
-        String repositoryCode =
-                repositoryAgent.generate(metadata);
-
-       String serviceCode =
+String entityCode =
+        entityAgent.generate(
+        metadata,
+        apis
+);
+ServiceGenerationResult result =
         serviceAgent.generate(
                 metadata,
-                apiContract
+                apis,
+                entityCode
+        );
+
+String serviceCode =
+        result.getServiceCode();
+
+String serviceContract =
+        result.getServiceContract();
+System.out.println("===== SERVICE CONTRACT =====");
+System.out.println(serviceContract);
+
+validateServiceMethods(serviceCode, apis);
+
+String repositoryCode =
+        repositoryAgent.generate(
+                metadata,
+                entityCode,
+                serviceCode,
+                serviceContract
         );
 
 String controllerCode =
         controllerAgent.generate(
                 metadata,
-                apiContract
+                entityCode,
+                apis,
+                serviceCode,
+                serviceContract
         );
+
+validateControllerMethods(controllerCode, apis);
+
 
         String pomCode =
                 configAgent.generatePom();
 
         String propertiesCode =
                 configAgent.generateProperties();
+
 
         // STEP 4 — Create Folder Structure
         fileWriterService.createProjectStructure(projectPath);
@@ -162,4 +182,35 @@ String controllerCode =
                 .runningUrl("http://localhost:8000")
                 .build();
     }
+private void validateServiceMethods(
+        String serviceCode,
+        List<ApiMetadata> apis) {
+
+    for (ApiMetadata api : apis) {
+
+        if (!serviceCode.contains(" " + api.getName() + "(")) {
+
+            throw new RuntimeException(
+                    "Service generation skipped API: "
+                            + api.getName()
+            );
+        }
+    }
+}
+
+private void validateControllerMethods(
+        String controllerCode,
+        List<ApiMetadata> apis) {
+
+    for (ApiMetadata api : apis) {
+
+        if (!controllerCode.contains(" " + api.getName() + "(")) {
+
+            throw new RuntimeException(
+                    "Controller generation skipped API: "
+                            + api.getName()
+            );
+        }
+    }
+}
 }

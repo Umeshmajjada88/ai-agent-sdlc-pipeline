@@ -1,6 +1,9 @@
 package com.example.springaidemo.dto;
 
+import java.util.List;
+
 import lombok.Data;
+
 
 @Data
 public class GenerateRequest {
@@ -10,4 +13,6 @@ public class GenerateRequest {
     private String entity;
 
     private String projectPath;
+
+    private List<ApiMetadata> apis;
 }
