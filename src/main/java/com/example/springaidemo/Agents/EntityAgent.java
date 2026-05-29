@@ -18,30 +18,32 @@ public class EntityAgent {
     public String generateEntity(RequirementDTO requirement) {
 
         String prompt = """
-                You are an expert Spring Boot developer.
-
-                STRICT RULES:
-                1. Generate ONLY raw Java code
-                2. No explanations
-                3. No markdown
-                4. Output must compile
-                5. Use the provided package and imports exactly
-                6. Do NOT regenerate imports
-
-                REQUIRED PACKAGE:
-                package com.example.springaidemo.entity;
-
-                REQUIRED IMPORTS:
-                import jakarta.persistence.Entity;
-                import jakarta.persistence.Id;
-                import jakarta.persistence.GeneratedValue;
-                import jakarta.persistence.GenerationType;
-
-                import lombok.Data;
-
-                Requirement:
-                %s
-                """.formatted(requirement);
+                You are a senior Spring Boot developer. Generate a production-grade JPA entity. 
+                STRICT RULES: 
+                1. Generate ONLY Java code 
+                2. No markdown 
+                3. No explanations
+                 4. Use Lombok 
+                 5. Use JPA annotations 
+                 6. Add validation annotations 
+                 7. Add column constraints 
+                 ENTITY REQUIREMENTS:
+                  - Use @Entity
+                  - Use @Table 
+                  - Use @Id 
+                  - Use @GeneratedValue 
+                  - Use @Column 
+                  - Use Lombok annotations 
+                  VALIDATION RULES: 
+                  - NOT_NULL -> @NotNull 
+                  - VALID_EMAIL -> @Email 
+                  - required=true -> @NotBlank 
+                  for String - unique=true -> @Column(unique = true) 
+                  - nullable=false -> @Column(nullable = false) 
+                  FIELDS: %s 
+                  VALIDATIONS: %s 
+                  ENTITY NAME: %s 
+                  """.formatted(requirement.getFields(), requirement.getValidations(), requirement.getEntityName());
 
         String response = chatClient.prompt()
                 .user(prompt)

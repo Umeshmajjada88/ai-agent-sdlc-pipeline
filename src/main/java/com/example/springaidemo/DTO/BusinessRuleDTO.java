@@ -11,18 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FieldDTO {
+public class BusinessRuleDTO {
 
     private String name;
 
-    private String type;
-
-    private Boolean required;
-
-    private Boolean unique;
-
-    private Boolean nullable;
-
-    private Boolean searchable;
+    private String description;
 }
+
 

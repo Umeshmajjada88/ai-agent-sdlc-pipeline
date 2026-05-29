@@ -21,39 +21,41 @@ public class RepositoryAgent {
             String entityName) {
 
         String prompt = """
-                You are an expert Spring Boot developer.
+                You are a senior Spring Data JPA developer.
+
+                Generate a production-grade repository interface.
 
                 STRICT RULES:
-                1. Generate ONLY raw Java code
-                2. No explanations
-                3. No markdown
-                4. Output must compile
-                5. Use provided imports exactly
-                6. Do NOT regenerate imports
+                1. Generate ONLY Java code
+                2. No markdown
+                3. No explanations
+                4. Extend JpaRepository
+                5. Generate custom query methods
 
-                REQUIRED PACKAGE:
-                package com.example.springaidemo.repository;
+                REPOSITORY REQUIREMENTS:
+                - Extend JpaRepository
+                - Use Optional where appropriate
+                - Generate derived query methods
+                - Generate existsBy methods
+                - Generate finder methods
 
-                REQUIRED IMPORTS:
-                import com.example.springaidemo.entity.%s;
+                CUSTOM METHODS:
+                %s
 
-                import org.springframework.data.jpa.repository.JpaRepository;
-                import org.springframework.stereotype.Repository;
+                ENTITY NAME:
+                %s
 
                 ENTITY CODE:
                 %s
-
-                Requirement:
-                %s
                 """.formatted(
+                requirement.getRepositoryMethods(),
                 entityName,
-                entityCode,
-                requirement);
+                entityCode);
 
         String response = chatClient.prompt()
-        .user(prompt)
-        .call()
-        .content();
+                .user(prompt)
+                .call()
+                .content();
 
         return AIResponseCleaner.clean(response);
     }
