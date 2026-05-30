@@ -21,7 +21,7 @@ public class ControllerAgent {
             String serviceCode,
             String entityName) {
 
-        String prompt = """
+            String prompt = """
                 You are an expert Spring Boot developer.
 
                 STRICT RULES:
@@ -59,11 +59,52 @@ public class ControllerAgent {
                 serviceCode,
                 requirement);
 
+        // String prompt = """
+        //         You are an expert Spring Boot developer.
+
+        //         STRICT RULES:
+        //         1. Generate ONLY raw Java code
+        //         2. No explanations
+        //         3. No markdown
+        //         4. Output must compile
+        //         5. Use provided imports exactly
+        //         6. Add Imports and packages correctly
+        //         7. Do NOT regenerate imports
+
+        //         mandatory REQUIRED PACKAGE:
+        //         package com.example.springaidemo.controller;
+
+        //         REQUIRED IMPORTS:
+        //         import com.example.springaidemo.entity.%s;
+        //         import com.example.springaidemo.service.%sService;
+
+        //         import org.springframework.http.ResponseEntity;
+        //         import org.springframework.web.bind.annotation.*;
+
+        //         import java.util.List;
+        //         import java.util.Optional;
+
+        //         ENTITY CODE:
+        //         %s
+
+        //         SERVICE CODE:
+        //         %s
+
+        //         Requirement:
+        //         %s
+        //         """.formatted(entityName,
+        //                 entityName,
+        //         entityCode,
+        //         serviceCode,
+        //         requirement);
+
         String response = chatClient.prompt()
         .user(prompt)
         .call()
         .content();
 
+        // String res1= AIResponseCleaner.clean(response);
+        // return AIResponseCleaner.addPackage(res1, entityName);
         return AIResponseCleaner.clean(response);
     }
 }

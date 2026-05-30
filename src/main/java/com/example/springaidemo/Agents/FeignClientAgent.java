@@ -33,10 +33,11 @@ public class FeignClientAgent {
                 Payment Service communication.
 
                 REQUIRED PACKAGE:
-                package com.example.generated.feign;
+                package com.example.springaidemo.feign;
 
                 REQUIRED IMPORTS:
 
+                import com.example.springaidemo.entity.%s;
                 import org.springframework.cloud.openfeign.FeignClient;
                 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class FeignClientAgent {
 
                 Entity:
                 %s
-                """.formatted(entityName);
+                """.formatted(entityName,entityName);
 
         String response = chatClient.prompt()
                 .user(prompt)

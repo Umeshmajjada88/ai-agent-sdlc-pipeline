@@ -13,4 +13,15 @@ public class AIResponseCleaner {
 
         return response;
     }
+    public static String addPackage(String response, String entityName){
+        return "package com.example.springaidemo.controller;\n import com.example.springaidemo.entity.%s;\n" + //
+                        "                import com.example.springaidemo.service.%sService;\n" + //
+                        "\n" + //
+                        "                import org.springframework.http.ResponseEntity;\n" + //
+                        "                import org.springframework.web.bind.annotation.*;\n" + //
+                        "\n" + //
+                        "                import java.util.List;\n" + //
+                        "                import java.util.Optional;".formatted(entityName) + response;
+                        
+    }
 }

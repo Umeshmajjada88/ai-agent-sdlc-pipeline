@@ -23,6 +23,7 @@ public class SDLCOrchestrator {
         private final ControllerAgent controllerAgent;
         private final FeignClientAgent feignClientAgent;
 
+
         public String execute(String input) {
 
                 try {
@@ -57,7 +58,7 @@ public class SDLCOrchestrator {
                                         entityName);
 
                         // GENERATED PROJECT PATH
-                        String basePath = "generated-project/src/main/java/com/example/generated/";
+                        String basePath = "/Users/devangkulkarni/genai/springaidemo/src/main/java/com/example/springaidemo/";
 
                         // CREATE DIRECTORIES
                         Files.createDirectories(

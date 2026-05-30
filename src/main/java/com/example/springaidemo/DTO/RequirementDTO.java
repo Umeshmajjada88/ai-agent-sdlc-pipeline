@@ -1,10 +1,12 @@
 package com.example.springaidemo.DTO;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class RequirementDTO {
 
     private String projectType;
